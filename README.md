@@ -102,6 +102,65 @@ Wait for the cluster reconciliation to finish:
 $ watch flux get kustomizations 
 ```
 
+## Application Bootstrap
+
+To experiment with progressive delivery, we are going to use a small application 
+called podinfo. This application is exposed outside the cluster with AppMesh 
+Gateway. The communication between the gateway and application is managed by 
+Flagger and AppMesh.
+
+The application manifests are comprised of a Kubernetes deployment, a 
+horizontal pod autoscaler, a gateway route (AppMesh custom resource) and 
+release polices (Flagger custom resources).
+
+```
+./apps/podinfo/
+├── abtest.yaml
+├── canary.yaml
+├── deployment.yaml
+├── gateway-route.yaml
+├── hpa.yaml
+└── kustomization.yaml
+```
+
+Based on the release policy, Flagger configures the mesh and bootstraps the 
+application inside the cluster.
+
+Wait for Flagger to initialize the canary:
+
+```
+$ watch kubectl -n apps get canary
+```
+
+Find the AppMesh Gateway public address with:
+
+```
+export URL="http://$(kubectl -n appmesh-gateway get svc/appmesh-gateway -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+echo $URL
+```
+
+Wait for the DNS to propagate and podinfo to become accessible:
+
+```
+$ watch curl -s ${URL}
+{
+  "hostname": "podinfo-primary-5cf44b9799-lgq79",
+  "version": "5.0.0"
+}
+```
+
+When the URL becomes available, open it in a browser and you'll see the 
+podinfo UI.
+
+## Automated Canary Promotion
+
+When you deploy a new application version, Flagger gradually shifts traffic to 
+the canary, and at the same time, measures the requests success rate as well as 
+the average response duration. Based on an analysis of these App Mesh provided 
+metrics, a canary deployment is either promoted or rolled back.
+
+![](docs/img/gitops-appmesh-stack.png)
+
 [flux]: https://fluxcd.io/
 [flagger]: https://fluxcd.io/flagger/
 [appmesh]: https://aws.amazon.com/app-mesh/
