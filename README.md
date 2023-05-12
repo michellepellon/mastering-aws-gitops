@@ -161,6 +161,65 @@ metrics, a canary deployment is either promoted or rolled back.
 
 ![](docs/img/gitops-appmesh-stack.png)
 
+The canary analysis is defined in `apps/podinfo/canary.yaml`:
+
+```
+  analysis:
+    # max traffic percentage routed to canary
+    maxWeight: 50
+    # canary increment step
+    stepWeight: 5
+    # time to wait between traffic increments
+    interval: 15s
+    # max number of failed metric checks before rollback
+    threshold: 5
+    # AppMesh Prometheus checks
+    metrics:
+      - name: request-success-rate
+        # minimum req success rate percentage (non 5xx)
+        thresholdRange:
+          min: 99
+        interval: 1m
+      - name: request-duration
+        # maximum req duration in milliseconds
+        thresholdRange:
+          max: 500
+        interval: 1m
+```
+
+Pull the changes from GitHub:
+
+```
+git pull origin main
+```
+
+## Cleanup
+
+Suspend the cluster reconciliation:
+
+```
+flux suspend kustomization cluster-addons
+```
+
+Delete the demo application and mesh addons:
+
+```
+flux delete kustomization apps -s
+flux delete kustomization mesh-addons -s
+```
+
+Delete the AppMesh mesh:
+
+```
+kubectl delete mesh --all
+```
+
+Delete the EKS cluster:
+
+```
+eksctl delete cluster -f .eksctl/config.yaml
+```
+
 [flux]: https://fluxcd.io/
 [flagger]: https://fluxcd.io/flagger/
 [appmesh]: https://aws.amazon.com/app-mesh/
