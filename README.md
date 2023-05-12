@@ -77,7 +77,7 @@ Verify that your EKS cluster satisfies the prerequisites with:
 ```
 $ flux check --pre
 ► checking prerequisites
-✔ Kubernetes 1.26.4-eks-0a21954 >=1.20.6-0
+✔ Kubernetes 1.24.13-eks-0a21954 >=1.20.6-0
 ✔ prerequisites checks passed
 ```
 
