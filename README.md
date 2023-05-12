@@ -100,6 +100,25 @@ Wait for the cluster reconciliation to finish:
 
 ```
 $ watch flux get kustomizations 
+NAME            REVISION                SUSPENDED       READY
+apps            main@sha1:7dc9c91e      False           True
+cluster-addons  main@sha1:7dc9c91e      False           True
+flux-system     main@sha1:7dc9c91e      False           True
+mesh            main@sha1:7dc9c91e      False           True    
+mesh-addons     main@sha1:7dc9c91e      False           True    
+```
+
+Verify that Flagger, Prometheus, AppMesh controller and gateway Helm releases 
+have been installed:
+
+```
+$ flux get helmreleases --all-namespaces
+NAMESPACE       NAME                    REVISION        SUSPENDED       READY   MESSAGE                          
+appmesh-gateway appmesh-gateway         0.1.5           False           True    Release reconciliation succeeded
+appmesh-system  appmesh-controller      1.11.0          False           True    Release reconciliation succeeded
+appmesh-system  appmesh-prometheus      1.0.2           False           True    Release reconciliation succeeded
+appmesh-system  flagger                 1.31.0          False           True    Release reconciliation succeeded
+kube-system     metrics-server          6.3.1           False           True    Release reconciliation succeeded
 ```
 
 ## Application Bootstrap
