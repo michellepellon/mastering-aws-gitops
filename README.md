@@ -76,6 +76,9 @@ Verify that your EKS cluster satisfies the prerequisites with:
 
 ```
 $ flux check --pre
+► checking prerequisites
+✔ Kubernetes 1.26.4-eks-0a21954 >=1.20.6-0
+✔ prerequisites checks passed
 ```
 
 Install Flux on your cluster with:
